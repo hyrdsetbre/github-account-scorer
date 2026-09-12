@@ -145,7 +145,7 @@ function calculateProfileScore(user: GitHubUser): {
  * 主评分函数
  */
 export function calculateScore(input: ScoreInput): ScoreResult {
-  const { user, repos, events, orgs, starredCount = 0 } = input;
+  const { user, events, orgs, starredCount = 0 } = input;
   const items: ScoreItem[] = [];
 
   // 1. 账号注册满 6 个月（25分）
