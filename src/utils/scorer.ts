@@ -15,6 +15,7 @@ interface ScoreInput {
   repos: GitHubRepo[];
   events: GitHubEvent[];
   orgs: GitHubOrg[];
+  starredCount?: number;
 }
 
 /**
@@ -144,7 +145,7 @@ function calculateProfileScore(user: GitHubUser): {
  * 主评分函数
  */
 export function calculateScore(input: ScoreInput): ScoreResult {
-  const { user, repos, events, orgs } = input;
+  const { user, repos, events, orgs, starredCount = 0 } = input;
   const items: ScoreItem[] = [];
 
   // 1. 账号注册满 6 个月（25分）
@@ -224,30 +225,27 @@ export function calculateScore(input: ScoreInput): ScoreResult {
     icon: 'folder',
   });
 
-  // 7. Star（6分）— 至少 2 个 Star 才算有效（1 个极可能是自刷小号）
-  const totalStars = repos.reduce((sum, r) => sum + r.stargazers_count, 0);
-  const hasStars = totalStars >= 2;
+  // 7. Star（6分）— 用户 star 了多少个项目（star 别人的仓库）
+  const hasStarred = starredCount > 0;
   items.push({
-    name: '获得 Star',
+    name: 'Star 项目',
     maxScore: 6,
-    score: hasStars ? 6 : 0,
-    passed: hasStars,
-    reason: hasStars
-      ? `共获得 ${totalStars} 个 Star`
-      : `仅 ${totalStars} 个 Star（需至少 2 个）`,
+    score: hasStarred ? 6 : 0,
+    passed: hasStarred,
+    reason: hasStarred
+      ? `已 star ${starredCount} 个项目`
+      : '尚未 star 任何项目',
     icon: 'star',
   });
 
-  // 8. followers（4分）— 至少 2 个关注者才算有效（1 个极可能是自刷小号）
-  const hasFollowers = user.followers >= 2;
+  // 8. followers（4分）
+  const hasFollowers = user.followers > 0;
   items.push({
     name: '关注者',
     maxScore: 4,
     score: hasFollowers ? 4 : 0,
     passed: hasFollowers,
-    reason: hasFollowers
-      ? `有 ${user.followers} 个关注者`
-      : `${user.followers} 个关注者（需至少 2 个）`,
+    reason: hasFollowers ? `有 ${user.followers} 个关注者` : '暂无关注者',
     icon: 'users',
   });
 

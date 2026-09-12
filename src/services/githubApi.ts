@@ -51,6 +51,16 @@ export async function fetchOrgs(username: string): Promise<GitHubOrg[]> {
   return response.json();
 }
 
+export async function fetchStarredCount(username: string): Promise<number> {
+  const response = await fetch(
+    `${BASE_URL}/users/${encodeURIComponent(username)}/starred?per_page=100`,
+    { headers }
+  );
+  if (!response.ok) return 0;
+  const data = await response.json();
+  return Array.isArray(data) ? data.length : 0;
+}
+
 export function formatDate(dateString: string): string {
   return new Date(dateString).toLocaleDateString('zh-CN', {
     year: 'numeric',
