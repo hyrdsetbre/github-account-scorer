@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Search, Loader2, AlertCircle, RefreshCw, ExternalLink, Calendar, GitBranch, Users } from 'lucide-react';
-import { fetchUser, fetchRepos, fetchEvents, fetchOrgs, fetchOrgDetails, formatDate } from '../services/githubApi';
+import { fetchUser, fetchRepos, fetchEvents, fetchOrgs, formatDate } from '../services/githubApi';
 import { calculateScore, PASS_THRESHOLD } from '../utils/scorer';
 import type { GitHubUser, ScoreResult } from '../types/github';
 import ScoreRing from '../components/ScoreRing';
@@ -32,20 +32,12 @@ export default function HomePage() {
         fetchOrgs(username.trim()),
       ]);
 
-      // 查询每个组织的详情（public_repos 等），用于排除空壳组织
-      const orgsWithDetails = await Promise.all(
-        orgsData.map(async (org) => {
-          const details = await fetchOrgDetails(org.login);
-          return details || org;
-        })
-      );
-
       setUser(userData);
       const result = calculateScore({
         user: userData,
         repos: reposData,
         events: eventsData,
-        orgs: orgsWithDetails,
+        orgs: orgsData,
       });
       setScoreResult(result);
     } catch (err) {

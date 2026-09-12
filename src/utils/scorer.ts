@@ -188,19 +188,15 @@ export function calculateScore(input: ScoreInput): ScoreResult {
   });
 
   // 4. 所属 Organization（15分）
-  // 排除空壳组织：公开仓库数 < 2 的组织不计分（自创建的占位组织）
-  const validOrgs = orgs.filter((o) => (o.public_repos ?? 0) >= 2);
-  const hasOrg = validOrgs.length > 0;
+  const hasOrg = orgs.length > 0;
   items.push({
     name: '所属 Organization',
     maxScore: 15,
     score: hasOrg ? 15 : 0,
     passed: hasOrg,
     reason: hasOrg
-      ? `属于 ${validOrgs.length} 个有效组织: ${validOrgs.map((o) => o.login).join(', ')}`
-      : (orgs.length > 0
-        ? `所属组织 ${orgs.map((o) => o.login).join(', ')} 公开仓库不足（<2个），不计分`
-        : '不属于任何 Organization'),
+      ? `属于 ${orgs.length} 个组织: ${orgs.map((o) => o.login).join(', ')}`
+      : '不属于任何 Organization',
     icon: 'building',
   });
 
@@ -240,14 +236,16 @@ export function calculateScore(input: ScoreInput): ScoreResult {
     icon: 'star',
   });
 
-  // 8. followers（4分）
-  const hasFollowers = user.followers > 0;
+  // 8. followers（4分）— 至少 2 个关注者才算有效（1 个极可能是自刷小号）
+  const hasFollowers = user.followers >= 2;
   items.push({
     name: '关注者',
     maxScore: 4,
     score: hasFollowers ? 4 : 0,
     passed: hasFollowers,
-    reason: hasFollowers ? `有 ${user.followers} 个关注者` : '暂无关注者',
+    reason: hasFollowers
+      ? `有 ${user.followers} 个关注者`
+      : `${user.followers} 个关注者（需至少 2 个）`,
     icon: 'users',
   });
 
