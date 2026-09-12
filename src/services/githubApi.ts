@@ -51,6 +51,15 @@ export async function fetchOrgs(username: string): Promise<GitHubOrg[]> {
   return response.json();
 }
 
+export async function fetchOrgDetails(orgLogin: string): Promise<GitHubOrg | null> {
+  const response = await fetch(
+    `${BASE_URL}/orgs/${encodeURIComponent(orgLogin)}`,
+    { headers }
+  );
+  if (!response.ok) return null;
+  return response.json();
+}
+
 export function formatDate(dateString: string): string {
   return new Date(dateString).toLocaleDateString('zh-CN', {
     year: 'numeric',
