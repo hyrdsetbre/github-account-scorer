@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Search, Loader2, AlertCircle, RefreshCw, ExternalLink, Calendar, GitBranch, Users } from 'lucide-react';
-import { fetchUser, fetchRepos, fetchEvents, fetchOrgs, fetchStarredCount, formatDate } from '../services/githubApi';
+import { fetchUser, fetchRepos, fetchEvents, fetchOrgs, fetchStarredCount, fetchCommitDates, formatDate } from '../services/githubApi';
 import { calculateScore, PASS_THRESHOLD } from '../utils/scorer';
 import type { GitHubUser, ScoreResult } from '../types/github';
 import ScoreRing from '../components/ScoreRing';
@@ -25,12 +25,13 @@ export default function HomePage() {
     setScoreResult(null);
 
     try {
-      const [userData, reposData, eventsData, orgsData, starredCount] = await Promise.all([
+      const [userData, reposData, eventsData, orgsData, starredCount, commitDates] = await Promise.all([
         fetchUser(username.trim()),
         fetchRepos(username.trim()),
         fetchEvents(username.trim()),
         fetchOrgs(username.trim()),
         fetchStarredCount(username.trim()),
+        fetchCommitDates(username.trim()),
       ]);
 
       setUser(userData);
@@ -40,6 +41,7 @@ export default function HomePage() {
         events: eventsData,
         orgs: orgsData,
         starredCount,
+        commitDates,
       });
       setScoreResult(result);
     } catch (err) {

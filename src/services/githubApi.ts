@@ -61,6 +61,28 @@ export async function fetchStarredCount(username: string): Promise<number> {
   return Array.isArray(data) ? data.length : 0;
 }
 
+export async function fetchCommitDates(username: string): Promise<string[]> {
+  const dates: string[] = [];
+  const repos = await fetchRepos(username);
+  for (const repo of repos.slice(0, 5)) {
+    try {
+      const response = await fetch(
+        `${BASE_URL}/repos/${encodeURIComponent(username)}/${encodeURIComponent(repo.name)}/commits?per_page=30`,
+        { headers }
+      );
+      if (!response.ok) continue;
+      const commits = await response.json();
+      if (Array.isArray(commits)) {
+        for (const c of commits) {
+          const date = c?.commit?.author?.date;
+          if (date) dates.push(date);
+        }
+      }
+    } catch {}
+  }
+  return dates;
+}
+
 export function formatDate(dateString: string): string {
   return new Date(dateString).toLocaleDateString('zh-CN', {
     year: 'numeric',

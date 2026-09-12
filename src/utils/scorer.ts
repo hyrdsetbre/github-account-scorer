@@ -16,6 +16,7 @@ interface ScoreInput {
   events: GitHubEvent[];
   orgs: GitHubOrg[];
   starredCount?: number;
+  commitDates?: string[];
 }
 
 /**
@@ -47,17 +48,15 @@ function hasCustomAvatar(user: GitHubUser): boolean {
 /**
  * 检查是否有跨多个月份的 commit 记录
  */
-function hasCrossTimeCommits(events: GitHubEvent[]): {
+function hasCrossTimeCommits(commitDates: string[]): {
   passed: boolean;
   months: Set<string>;
 } {
   const months = new Set<string>();
-  for (const event of events) {
-    if (event.type === 'PushEvent' && event.payload.commits) {
-      const date = new Date(event.created_at);
-      const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
-      months.add(monthKey);
-    }
+  for (const dateStr of commitDates) {
+    const date = new Date(dateStr);
+    const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
+    months.add(monthKey);
   }
   return { passed: months.size >= 2, months };
 }
@@ -145,7 +144,7 @@ function calculateProfileScore(user: GitHubUser): {
  * 主评分函数
  */
 export function calculateScore(input: ScoreInput): ScoreResult {
-  const { user, events, orgs, starredCount = 0 } = input;
+  const { user, events, orgs, starredCount = 0, commitDates = [] } = input;
   const items: ScoreItem[] = [];
 
   // 1. 账号注册满 6 个月（25分）
@@ -163,7 +162,7 @@ export function calculateScore(input: ScoreInput): ScoreResult {
   });
 
   // 2. 跨时间 commit 记录（20分）
-  const commitCheck = hasCrossTimeCommits(events);
+  const commitCheck = hasCrossTimeCommits(commitDates);
   items.push({
     name: '跨时间 commit 记录',
     maxScore: 20,
