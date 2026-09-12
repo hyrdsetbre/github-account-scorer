@@ -5,6 +5,7 @@ import { calculateScore, PASS_THRESHOLD } from '../utils/scorer';
 import type { GitHubUser, ScoreResult } from '../types/github';
 import ScoreRing from '../components/ScoreRing';
 import ScoreItemCard from '../components/ScoreItemCard';
+import AgentScopeCard from '../components/AgentScopeCard';
 import { GithubIcon } from '../components/GithubIcon';
 
 export default function HomePage() {
@@ -154,6 +155,9 @@ export default function HomePage() {
             <p className="mt-6 text-xs text-slate-400 dark:text-slate-500">
               及格线：{PASS_THRESHOLD} 分 | 满分：123 分
             </p>
+
+            {/* AgentScope Platform 介绍卡片 */}
+            <AgentScopeCard variant="info" />
           </div>
         )}
 
@@ -240,6 +244,13 @@ export default function HomePage() {
                 <ScoreItemCard key={item.name} item={item} index={index} />
               ))}
             </div>
+
+            {/* AgentScope Platform 结果卡片 */}
+            <AgentScopeCard
+              variant="result"
+              passed={scoreResult.passed}
+              score={scoreResult.total}
+            />
 
             {/* Note */}
             <div className="mt-8 p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl">
