@@ -224,15 +224,17 @@ export function calculateScore(input: ScoreInput): ScoreResult {
     icon: 'folder',
   });
 
-  // 7. Star（6分）
+  // 7. Star（6分）— 至少 2 个 Star 才算有效（1 个极可能是自刷小号）
   const totalStars = repos.reduce((sum, r) => sum + r.stargazers_count, 0);
-  const hasStars = totalStars > 0;
+  const hasStars = totalStars >= 2;
   items.push({
     name: '获得 Star',
     maxScore: 6,
     score: hasStars ? 6 : 0,
     passed: hasStars,
-    reason: hasStars ? `共获得 ${totalStars} 个 Star` : '尚未获得任何 Star',
+    reason: hasStars
+      ? `共获得 ${totalStars} 个 Star`
+      : `仅 ${totalStars} 个 Star（需至少 2 个）`,
     icon: 'star',
   });
 
